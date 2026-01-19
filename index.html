@@ -36,7 +36,11 @@
         .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
         
         .level-card { background: white; border-radius: 25px; padding: 25px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 10px solid var(--cyan); }
-        .group-box { background: #f9fbfd; padding: 25px; border-radius: 20px; margin-top: 25px; border: 1px solid #eef2f6; }
+        .group-box { background: #f9fbfd; padding: 15px; border-radius: 20px; margin-top: 15px; border: 1px solid #eef2f6; }
+        
+        .group-header { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; }
+        .group-content { display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+
         .flex-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; }
         .field-wrap { display: flex; flex-direction: column; gap: 5px; flex: 1; }
         .lbl { font-size: 11px; font-weight: 800; color: #a0aec0; text-transform: uppercase; }
@@ -46,6 +50,7 @@
 
         .btn-navy { background: var(--navy); color: white; height: 48px; padding: 0 25px; }
         .btn-cyan { background: var(--cyan); color: white; height: 48px; padding: 0 25px; }
+        .btn-toggle-gp { background: #e0f2fe; color: #0369a1; height: 40px; padding: 0 15px; font-size: 12px; border-radius: 10px; }
         .btn-delete { background: #fff0f3; color: #ff4d6d; height: 48px; padding: 0 20px; border: 2px solid #ffccd5; }
         
         .toggle-btn { 
@@ -90,10 +95,12 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    db.enablePersistence().catch((err) => console.error(err.code));
 
     let levelsData = [];
     const MASTER_PASSWORD = "123"; 
+    
+    // لتخزين المجموعات والطلاب المفتوحين حالياً عشان ما يقفلوش وقت التحديث
+    let openStates = { groups: {}, students: {} };
 
     function checkPass() {
         const val = document.getElementById('pass-field').value.trim();
@@ -115,15 +122,20 @@
         });
     }
 
-    function toggleSessions(btn) {
+    function toggleSessions(btn, id) {
         const container = btn.closest('.student-card').querySelector('.sessions-container');
-        if (container.style.display === "block") {
-            container.style.display = "none";
-            btn.innerText = "VIEW SESSIONS ▼";
-        } else {
-            container.style.display = "block";
-            btn.innerText = "CLOSE SESSIONS ▲";
-        }
+        const isOpen = container.style.display === "block";
+        container.style.display = isOpen ? "none" : "block";
+        btn.innerText = isOpen ? "VIEW SESSIONS ▼" : "CLOSE SESSIONS ▲";
+        openStates.students[id] = !isOpen;
+    }
+
+    function toggleGroupBox(btn, id) {
+        const content = btn.closest('.group-box').querySelector('.group-content');
+        const isOpen = content.style.display === "block";
+        content.style.display = isOpen ? "none" : "block";
+        btn.innerText = isOpen ? "OPEN GROUP ▼" : "HIDE GROUP ▲";
+        openStates.groups[id] = !isOpen;
     }
 
     function render() {
@@ -133,44 +145,60 @@
             const div = document.createElement('div');
             div.className = 'level-card';
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <h2 style="margin:0; font-weight:900; color:var(--navy); font-size: 30px;">${lv.name}</h2>
                     <button class="btn-navy" onclick="newGp(${lIdx})">+ NEW GROUP</button>
                 </div>
-                ${(lv.groups || []).map((gp, gIdx) => `
+                ${(lv.groups || []).map((gp, gIdx) => {
+                    const gpId = `${lv.id}-g-${gIdx}`;
+                    const isGpOpen = openStates.groups[gpId];
+                    return `
                     <div class="group-box">
-                        <div class="flex-row">
-                            <div class="field-wrap"><span class="lbl">Session Day</span><input type="text" value="${gp.day || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'day', this.value)"></div>
-                            <div class="field-wrap"><span class="lbl">Session Time</span><input type="text" value="${gp.time || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'time', this.value)"></div>
-                            <button class="btn-cyan" onclick="newSt(${lIdx}, ${gIdx})">+ STUDENT</button>
-                            <button class="btn-delete" onclick="delGp(${lIdx}, ${gIdx})">DELETE GROUP</button>
+                        <div class="group-header">
+                            <span style="font-weight:900; color:var(--navy)">
+                                Group | <span style="color:var(--cyan)">${gp.day || '---'}</span> | <span style="color:var(--pink)">${gp.time || '---'}</span>
+                            </span>
+                            <button class="btn-toggle-gp" onclick="toggleGroupBox(this, '${gpId}')">
+                                ${isGpOpen ? 'HIDE GROUP ▲' : 'OPEN GROUP ▼'}
+                            </button>
                         </div>
-                        ${(gp.children || []).map((st, sIdx) => `
-                            <div class="student-card" style="background:white; padding:20px; border-radius:18px; margin-top:15px; border:1px solid #edf2f7;">
-                                <div style="display: flex; align-items: flex-end; gap: 10px;">
-                                    
-                                    <div class="field-wrap" style="flex: 1.2; min-width: 120px;">
-                                        <span class="lbl" style="color:var(--pink)">Student Name</span>
-                                        <input type="text" class="st-name-input" value="${st.name || ''}" onchange="upSt(${lIdx}, ${gIdx}, ${sIdx}, this.value)">
-                                    </div>
-                                    
-                                    <button class="toggle-btn" style="flex: 1;" onclick="toggleSessions(this)">VIEW SESSIONS ▼</button>
-                                    <button class="btn-delete" style="width:48px; padding:0; height:48px; flex:none;" onclick="delSt(${lIdx}, ${gIdx}, ${sIdx})">✕</button>
-                                </div>
-                                
-                                <div class="sessions-container">
-                                    ${(st.sessions || []).map((ss, ssIdx) => `
-                                        <div class="session-row">
-                                            <div class="session-badge">SESSION ${ssIdx+1}</div>
-                                            <input type="date" value="${ss.date || ''}" onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'date', this.value)">
-                                            <textarea placeholder="Notes..." onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'feedback', this.value)">${ss.feedback || ''}</textarea>
-                                        </div>
-                                    `).join('')}
-                                </div>
+                        
+                        <div class="group-content" style="display: ${isGpOpen ? 'block' : 'none'}">
+                            <div class="flex-row">
+                                <div class="field-wrap"><span class="lbl">Session Day</span><input type="text" value="${gp.day || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'day', this.value)"></div>
+                                <div class="field-wrap"><span class="lbl">Session Time</span><input type="text" value="${gp.time || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'time', this.value)"></div>
+                                <button class="btn-cyan" onclick="newSt(${lIdx}, ${gIdx})">+ STUDENT</button>
+                                <button class="btn-delete" onclick="delGp(${lIdx}, ${gIdx})">DELETE GROUP</button>
                             </div>
-                        `).join('')}
+                            ${(gp.children || []).map((st, sIdx) => {
+                                const stId = `${gpId}-s-${sIdx}`;
+                                const isStOpen = openStates.students[stId];
+                                return `
+                                <div class="student-card" style="background:white; padding:20px; border-radius:18px; margin-top:15px; border:1px solid #edf2f7;">
+                                    <div style="display: flex; align-items: flex-end; gap: 10px;">
+                                        <div class="field-wrap" style="flex: 1.2; min-width: 120px;">
+                                            <span class="lbl" style="color:var(--pink)">Student Name</span>
+                                            <input type="text" class="st-name-input" value="${st.name || ''}" onchange="upSt(${lIdx}, ${gIdx}, ${sIdx}, this.value)">
+                                        </div>
+                                        <button class="toggle-btn" style="flex: 1;" onclick="toggleSessions(this, '${stId}')">
+                                            ${isStOpen ? 'CLOSE SESSIONS ▲' : 'VIEW SESSIONS ▼'}
+                                        </button>
+                                        <button class="btn-delete" style="width:48px; padding:0; height:48px; flex:none;" onclick="delSt(${lIdx}, ${gIdx}, ${sIdx})">✕</button>
+                                    </div>
+                                    <div class="sessions-container" style="display: ${isStOpen ? 'block' : 'none'}">
+                                        ${(st.sessions || []).map((ss, ssIdx) => `
+                                            <div class="session-row">
+                                                <div class="session-badge">SESSION ${ssIdx+1}</div>
+                                                <input type="date" value="${ss.date || ''}" onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'date', this.value)">
+                                                <textarea placeholder="Notes..." onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'feedback', this.value)">${ss.feedback || ''}</textarea>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
                     </div>
-                `).join('')}
+                `}).join('')}
             `;
             root.appendChild(div);
         });
