@@ -10,7 +10,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&display=swap');
-        :root { --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; --yellow: #fbc531; --bg-page: #f0f7f9; --input-h: 48px; }
+        :root { --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; --yellow: #fbc531; --bg-page: #f0f7f9; }
         body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-page); direction: ltr; }
 
         /* شاشة القفل */
@@ -29,7 +29,7 @@
         }
         .btn-login {
             background: var(--pink); color: white; border: none; width: 100%;
-            height: 55px; border-radius: 15px; font-weight: 900; cursor: pointer; transition: 0.3s;
+            height: 55px; border-radius: 15px; font-weight: 900; cursor: pointer;
         }
 
         /* لوحة التحكم */
@@ -47,7 +47,7 @@
         input, textarea { border-radius: 12px; border: 2px solid #edf2f7; padding: 12px; font-family: 'Poppins'; font-weight: 600; box-sizing: border-box; }
         button { cursor: pointer; border-radius: 12px; font-weight: 900; border: none; transition: 0.2s; }
         .btn-navy { background: var(--navy); color: white; height: 48px; padding: 0 25px; }
-        .btn-cyan { background: var(--cyan); color: white; height: 48px; padding: 0 25px; }
+        .btn-cyan { background: var(--cyan) !important; color: white !important; height: 48px; padding: 0 25px; }
         .btn-delete { background: #fff0f3; color: #ff4d6d; height: 48px; padding: 0 20px; border: 2px solid #ffccd5; }
         .st-name-input { width: 280px !important; border-color: var(--cyan); flex: none !important; }
         .session-row { display: grid; grid-template-columns: 100px 180px 1fr; gap: 12px; margin-top: 12px; align-items: center; }
@@ -84,6 +84,12 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    // تفعيل خاصية الأوفلاين
+    db.enablePersistence().catch((err) => {
+        console.error("Persistence error:", err.code);
+    });
+
     let levelsData = [];
     const MASTER_PASSWORD = "123"; 
 
