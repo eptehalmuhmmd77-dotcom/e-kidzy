@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy</title>
+    <title>E-Kidzy | Management System</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&display=swap');
-        :root { --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; --yellow: #fbc531; --bg-page: #f0f7f9; }
+
+        :root {
+            --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63;
+            --yellow: #fbc531; --bg-page: #f0f7f9; --input-h: 48px;
+        }
+
         body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-page); direction: ltr; }
 
         /* شاشة القفل */
@@ -35,23 +40,48 @@
         /* لوحة التحكم */
         .main-header {
             background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 60%, var(--pink) 100%);
-            padding: 60px 20px; text-align: center; color: white; border-bottom: 8px solid var(--yellow);
+            padding: 50px 20px; text-align: center; color: white; border-bottom: 8px solid var(--yellow);
         }
-        .brand-name { font-size: 75px; font-weight: 900; margin: 0; letter-spacing: -3px; }
+        .brand-name { font-size: 60px; font-weight: 900; margin: 0; letter-spacing: -2px; }
         .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
-        .level-card { background: white; border-radius: 25px; padding: 25px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 10px solid var(--cyan); }
-        .group-box { background: #f9fbfd; padding: 25px; border-radius: 20px; margin-top: 25px; border: 1px solid #eef2f6; }
+        
+        .level-card { 
+            background: white; border-radius: 25px; padding: 25px; margin-bottom: 40px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 10px solid var(--cyan); 
+        }
+        
+        .group-box { 
+            background: #f9fbfd; padding: 25px; border-radius: 20px; margin-top: 25px; 
+            border: 1px solid #eef2f6; 
+        }
+
         .flex-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; }
         .field-wrap { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
         .lbl { font-size: 11px; font-weight: 800; color: #a0aec0; text-transform: uppercase; }
-        input, textarea { border-radius: 12px; border: 2px solid #edf2f7; padding: 12px; font-family: 'Poppins'; font-weight: 600; box-sizing: border-box; }
+
+        input, textarea { 
+            border-radius: 12px; border: 2px solid #edf2f7; padding: 12px; 
+            font-family: 'Poppins'; font-weight: 600; box-sizing: border-box; 
+        }
+
         button { cursor: pointer; border-radius: 12px; font-weight: 900; border: none; transition: 0.2s; }
+
         .btn-navy { background: var(--navy); color: white; height: 48px; padding: 0 25px; }
-        .btn-cyan { background: var(--cyan) !important; color: white !important; height: 48px; padding: 0 25px; }
+        .btn-cyan { background: var(--cyan); color: white; height: 48px; padding: 0 25px; }
         .btn-delete { background: #fff0f3; color: #ff4d6d; height: 48px; padding: 0 20px; border: 2px solid #ffccd5; }
+        
+        /* ميزات التاب الجديد (القوائم المنطوية) */
+        .student-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .toggle-btn { 
+            background: #f0f7f9; color: var(--cyan); border: 2px solid var(--cyan); 
+            padding: 8px 15px; font-size: 12px; border-radius: 10px; font-weight: 800;
+        }
+        .sessions-container { display: none; margin-top: 20px; border-top: 2px dashed #edf2f7; padding-top: 15px; }
+
         .st-name-input { width: 280px !important; border-color: var(--cyan); flex: none !important; }
         .session-row { display: grid; grid-template-columns: 100px 180px 1fr; gap: 12px; margin-top: 12px; align-items: center; }
         .session-badge { background: #f1f5f9; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; border-radius: 12px; }
+        
         textarea { height: 65px; resize: none; width: 100%; }
     </style>
 </head>
@@ -59,7 +89,7 @@
 
 <div id="lock-screen">
     <div class="login-box">
-        <h1 style="color:var(--navy); margin:0 0 25px 0; font-size: 45px; letter-spacing: -2px;">E-Kidzy</h1>
+        <h1 style="color:var(--navy); margin:0 0 20px 0; font-size: 45px; letter-spacing: -2px;">E-Kidzy</h1>
         <input type="password" id="pass-field" placeholder="Password">
         <button class="btn-login" onclick="checkPass()">LOG IN</button>
         <p id="err-msg" style="color:red; font-size:13px; margin-top:15px; display:none;">❌ Incorrect!</p>
@@ -85,10 +115,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // تفعيل خاصية الأوفلاين
-    db.enablePersistence().catch((err) => {
-        console.error("Persistence error:", err.code);
-    });
+    // تفعيل العمل أوفلاين
+    db.enablePersistence().catch((err) => console.error(err.code));
 
     let levelsData = [];
     const MASTER_PASSWORD = "123"; 
@@ -113,6 +141,19 @@
         });
     }
 
+    function toggleSessions(btn) {
+        const container = btn.closest('.student-card').querySelector('.sessions-container');
+        if (container.style.display === "block") {
+            container.style.display = "none";
+            btn.innerText = "VIEW SESSIONS ▼";
+            btn.style.background = "#f0f7f9";
+        } else {
+            container.style.display = "block";
+            btn.innerText = "CLOSE SESSIONS ▲";
+            btn.style.background = "#e0f2f7";
+        }
+    }
+
     function render() {
         const root = document.getElementById('app-root');
         root.innerHTML = '';
@@ -133,21 +174,27 @@
                             <button class="btn-delete" onclick="delGp(${lIdx}, ${gIdx})">DELETE GROUP</button>
                         </div>
                         ${(gp.children || []).map((st, sIdx) => `
-                            <div style="background:white; padding:20px; border-radius:18px; margin-top:15px; border:1px solid #edf2f7;">
-                                <div class="flex-row" style="margin-bottom:15px;">
-                                    <div class="field-wrap" style="flex:none">
-                                        <span class="lbl" style="color:var(--pink)">Student Name</span>
-                                        <input type="text" class="st-name-input" value="${st.name || ''}" onchange="upSt(${lIdx}, ${gIdx}, ${sIdx}, this.value)">
+                            <div class="student-card" style="background:white; padding:20px; border-radius:18px; margin-top:15px; border:1px solid #edf2f7;">
+                                <div class="student-header">
+                                    <div class="flex-row" style="margin-bottom:0; flex:1;">
+                                        <div class="field-wrap" style="flex:none">
+                                            <span class="lbl" style="color:var(--pink)">Student Name</span>
+                                            <input type="text" class="st-name-input" value="${st.name || ''}" onchange="upSt(${lIdx}, ${gIdx}, ${sIdx}, this.value)">
+                                        </div>
+                                        <button class="toggle-btn" onclick="toggleSessions(this)">VIEW SESSIONS ▼</button>
                                     </div>
-                                    <button class="btn-delete" style="width:48px; padding:0; height:48px;" onclick="delSt(${lIdx}, ${gIdx}, ${sIdx})">✕</button>
+                                    <button class="btn-delete" style="width:48px; padding:0; height:48px; margin-left:10px" onclick="delSt(${lIdx}, ${gIdx}, ${sIdx})">✕</button>
                                 </div>
-                                ${(st.sessions || []).map((ss, ssIdx) => `
-                                    <div class="session-row">
-                                        <div class="session-badge">SESSION ${ssIdx+1}</div>
-                                        <input type="date" value="${ss.date || ''}" onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'date', this.value)">
-                                        <textarea placeholder="Notes..." onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'feedback', this.value)">${ss.feedback || ''}</textarea>
-                                    </div>
-                                `).join('')}
+                                
+                                <div class="sessions-container">
+                                    ${(st.sessions || []).map((ss, ssIdx) => `
+                                        <div class="session-row">
+                                            <div class="session-badge">SESSION ${ssIdx+1}</div>
+                                            <input type="date" value="${ss.date || ''}" onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'date', this.value)">
+                                            <textarea placeholder="Notes..." onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'feedback', this.value)">${ss.feedback || ''}</textarea>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                         `).join('')}
                     </div>
