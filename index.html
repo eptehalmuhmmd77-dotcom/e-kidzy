@@ -107,7 +107,6 @@
             const div = document.createElement('div');
             div.className = 'level-card';
             
-            // Collect hidden students for this level
             let hiddenOnes = [];
             (lv.groups || []).forEach((gp, gIdx) => {
                 (gp.children || []).forEach((st, sIdx) => {
@@ -149,7 +148,9 @@
                                     <div style="display:flex; gap:8px; align-items:end;">
                                         <div style="flex:2"><span class="lbl">Student Name</span><input type="text" value="${st.name||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'name',this.value)"></div>
                                         <div style="flex:1"><span class="lbl">WhatsApp</span><input type="text" value="${st.phone||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'phone',this.value)"></div>
-                                        <button class="btn-share" onclick="shareFeedback(${lIdx},${gIdx},${sIdx})">SHARE</button>
+                                        
+                                        <button class="btn-share" onclick="printStudentReport(${lIdx},${gIdx},${sIdx})">PRINT</button>
+                                        
                                         <button class="btn-hide" onclick="hideStudent(${lIdx},${gIdx},${sIdx}, true)">HIDE</button>
                                         <button class="btn-navy" style="height:50px;" onclick="toggleBox('students','${stId}')">${isStOpen ? '▲' : 'SESSIONS'}</button>
                                         <button class="btn-del" onclick="delSt(${lIdx},${gIdx},${sIdx})">✕</button>
@@ -205,11 +206,73 @@
         sync(l);
     }
 
-    function shareFeedback(l, g, s) {
+    // دالة الطباعة الجديدة
+    function printStudentReport(l, g, s) {
         const st = levelsData[l].groups[g].children[s];
-        let report = `*E-Kidzy Report*%0A*Student:* ${st.name}%0A`;
-        st.sessions.forEach((ss, i) => { if(ss.feedback) report += `*S${i+1}:* ${ss.feedback}%0A`; });
-        window.open(`https://wa.me/2${st.phone}?text=${report}`, '_blank');
+        const levelName = levelsData[l].name;
+        
+        let sessionRows = '';
+        st.sessions.forEach((ss, i) => {
+            if(ss.feedback || ss.date) {
+                sessionRows += `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">Session ${i+1}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${ss.date || '---'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 18px;">${ss.present ? '✅' : '❌'}</td>
+                        <td style="border: 1px solid #ddd; padding: 10px;">${ss.feedback || '---'}</td>
+                    </tr>`;
+            }
+        });
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Report - ${st.name}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Poppins', sans-serif; padding: 40px; color: #1b2a4e; line-height: 1.6; }
+                    .header { text-align: center; border-bottom: 5px solid #00a1df; padding-bottom: 20px; margin-bottom: 30px; }
+                    .header h1 { margin: 0; font-size: 36px; color: #1b2a4e; }
+                    .info-box { background: #f8fafc; padding: 20px; border-radius: 15px; margin-bottom: 30px; border-left: 8px solid #e91e63; }
+                    .info-box p { margin: 5px 0; font-size: 18px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+                    th { background-color: #1b2a4e; color: white; border: 1px solid #ddd; padding: 15px; text-transform: uppercase; font-size: 14px; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>E-KIDZY PROGRESS REPORT</h1>
+                </div>
+                <div class="info-box">
+                    <p><strong>Student Name:</strong> ${st.name}</p>
+                    <p><strong>Level:</strong> ${levelName}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Session No.</th>
+                            <th>Date</th>
+                            <th>Attendance</th>
+                            <th>Performance Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sessionRows}
+                    </tbody>
+                </table>
+                <p style="margin-top: 40px; text-align: center; font-size: 12px; color: #64748b;">Generated by E-Kidzy Management System</p>
+                <script>
+                    window.onload = function() { 
+                        setTimeout(() => { window.print(); window.close(); }, 500); 
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     function sendWA(l, g, s, ssIdx) {
