@@ -3,86 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Smart Management</title>
+    <title>E-Kidzy | Pro Management</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800;900&display=swap');
-        :root { --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; --yellow: #fbc531; --bg-page: #f0f7f9; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
+        :root { --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; --yellow: #fbc531; --bg-page: #d1d9e6; --green: #27ae60; --red: #e74c3c; }
+        
         body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-page); direction: ltr; }
 
-        #lock-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 100%);
-            display: flex; align-items: center; justify-content: center; z-index: 9999;
-        }
-        .login-box {
-            background: white; padding: 40px; border-radius: 30px;
-            text-align: center; width: 320px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .login-box input {
-            width: 100%; height: 55px; border-radius: 15px; border: 2px solid #edf2f7;
-            text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 20px; box-sizing: border-box;
-        }
-        .btn-login { background: var(--pink); color: white; border: none; width: 100%; height: 55px; border-radius: 15px; font-weight: 900; }
+        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 35px 25px; border-radius: 25px; text-align: center; width: 300px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .login-box h1 { font-size: 35px; margin: 0 0 20px 0; color: var(--navy); font-weight: 900; }
+        .login-box input { width: 100%; height: 50px; border-radius: 12px; border: 2px solid #e2e8f0; text-align: center; margin-bottom: 20px; font-size: 18px; box-sizing: border-box; }
+        .btn-login { background: var(--pink); color: white; border: none; width: 100%; height: 50px; border-radius: 12px; font-weight: 900; cursor: pointer; }
 
-        .main-header {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 60%, var(--pink) 100%);
-            padding: 50px 20px; text-align: center; color: white; border-bottom: 8px solid var(--yellow);
-        }
+        .main-header { background: linear-gradient(135deg, var(--navy) 0%, var(--cyan) 60%, var(--pink) 100%); padding: 40px 20px; text-align: center; color: white; border-bottom: 8px solid var(--yellow); }
         .brand-name { font-size: 60px; font-weight: 900; margin: 0; letter-spacing: -2px; }
-        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
+        .container { max-width: 1150px; margin: 20px auto; padding: 20px; }
         
-        .level-card { background: white; border-radius: 25px; padding: 25px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 10px solid var(--cyan); }
-        .group-box { background: #f9fbfd; padding: 15px; border-radius: 20px; margin-top: 15px; border: 1px solid #eef2f6; }
+        .level-card { background: #f8fafc; border-radius: 30px; padding: 25px; margin-bottom: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 12px solid var(--navy); position: relative; }
+        .group-box { background: white; padding: 18px; border-radius: 25px; margin-top: 20px; border: 1px solid #e2e8f0; }
+        .pill { background: #f1f5f9; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 800; color: var(--navy); border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 6px; }
+
+        .group-content { display: none; margin-top: 20px; border-top: 2px solid #f1f5f9; padding-top: 20px; }
+        .lbl { font-size: 12px; font-weight: 900; color: #334155; text-transform: uppercase; margin-bottom: 5px; display: block; }
+
+        input, textarea { border-radius: 12px; border: 2px solid #cbd5e1; padding: 12px; font-family: 'Poppins'; font-weight: 600; width: 100%; box-sizing: border-box; }
         
-        .group-header { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; }
-        .group-content { display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-
-        .flex-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; }
-        .field-wrap { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-        .lbl { font-size: 11px; font-weight: 800; color: #a0aec0; text-transform: uppercase; }
-
-        input, textarea { border-radius: 12px; border: 2px solid #edf2f7; padding: 12px; font-family: 'Poppins'; font-weight: 600; box-sizing: border-box; }
         button { cursor: pointer; border-radius: 12px; font-weight: 900; border: none; transition: 0.2s; }
+        .btn-navy { background: var(--navy); color: white; height: 50px; padding: 0 20px; }
+        .btn-cyan { background: var(--cyan); color: white; height: 50px; padding: 0 20px; }
+        .btn-share { background: #6366f1; color: white; height: 50px; padding: 0 15px; font-size: 11px; }
+        .btn-hide { background: #94a3b8; color: white; height: 50px; padding: 0 15px; font-size: 11px; }
+        .btn-del { background: #fee2e2; color: var(--red); height: 50px; width: 50px; }
+        .btn-wa { background: #25d366; color: white; width: 50px; height: 60px; font-size: 22px; }
 
-        .btn-navy { background: var(--navy); color: white; height: 48px; padding: 0 25px; }
-        .btn-cyan { background: var(--cyan); color: white; height: 48px; padding: 0 25px; }
-        .btn-toggle-gp { background: #e0f2fe; color: #0369a1; height: 40px; padding: 0 15px; font-size: 12px; border-radius: 10px; }
-        .btn-delete { background: #fff0f3; color: #ff4d6d; height: 48px; padding: 0 20px; border: 2px solid #ffccd5; }
+        .session-row { display: grid; grid-template-columns: 80px 100px 160px 1fr 60px; gap: 10px; margin-top: 10px; align-items: center; background: #fff; padding: 10px; border-radius: 15px; border: 1px solid #e2e8f0; }
         
-        .toggle-btn { 
-            background: #f0f7f9; color: var(--cyan); border: 2px solid var(--cyan); 
-            padding: 0 15px; font-size: 11px; border-radius: 12px; font-weight: 800;
-            height: 48px; display: flex; align-items: center; justify-content: center;
-        }
-        .sessions-container { display: none; margin-top: 20px; border-top: 2px dashed #edf2f7; padding-top: 15px; }
+        /* Archive List */
+        .archive-list { margin-top: 20px; padding: 15px; background: #e2e8f0; border-radius: 20px; display: none; }
+        .archive-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 15px; border-radius: 12px; margin-bottom: 8px; }
 
-        .st-name-input { width: 100% !important; border-color: var(--cyan); }
-        .session-row { display: grid; grid-template-columns: 100px 180px 1fr; gap: 12px; margin-top: 12px; align-items: center; }
-        .session-badge { background: #f1f5f9; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; border-radius: 12px; }
-        textarea { height: 65px; resize: none; width: 100%; }
+        @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } }
     </style>
 </head>
 <body>
 
 <div id="lock-screen">
     <div class="login-box">
-        <h1 style="color:var(--navy); margin:0 0 20px 0; font-size: 45px; letter-spacing: -2px;">E-Kidzy</h1>
+        <h1>E-Kidzy</h1>
         <input type="password" id="pass-field" placeholder="Password">
-        <button class="btn-login" onclick="checkPass()">LOG IN</button>
-        <p id="err-msg" style="color:red; font-size:13px; margin-top:15px; display:none;">❌ Incorrect!</p>
+        <button onclick="checkPass()" class="btn-login">LOG IN</button>
     </div>
 </div>
 
 <div id="main-content" style="display:none;">
-    <header class="main-header">
-        <h1 class="brand-name">E-Kidzy</h1>
-    </header>
-    <div class="container" id="app-root"></div>
+    <header class="main-header"><h1 class="brand-name">E-Kidzy</h1></header>
+    <div class="container">
+        <div id="app-root"></div>
+    </div>
 </div>
+
+<div id="print-area"></div>
 
 <script>
     const firebaseConfig = {
@@ -97,20 +82,13 @@
     const db = firebase.firestore();
 
     let levelsData = [];
-    const MASTER_PASSWORD = "123"; 
-    
-    // لتخزين المجموعات والطلاب المفتوحين حالياً عشان ما يقفلوش وقت التحديث
-    let openStates = { groups: {}, students: {} };
+    let openStates = { groups: {}, students: {}, archives: {} };
 
     function checkPass() {
-        const val = document.getElementById('pass-field').value.trim();
-        if (val === MASTER_PASSWORD) {
+        if (document.getElementById('pass-field').value === "123") {
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             init(); 
-        } else {
-            document.getElementById('err-msg').style.display = 'block';
-            document.getElementById('pass-field').value = '';
         }
     }
 
@@ -122,75 +100,68 @@
         });
     }
 
-    function toggleSessions(btn, id) {
-        const container = btn.closest('.student-card').querySelector('.sessions-container');
-        const isOpen = container.style.display === "block";
-        container.style.display = isOpen ? "none" : "block";
-        btn.innerText = isOpen ? "VIEW SESSIONS ▼" : "CLOSE SESSIONS ▲";
-        openStates.students[id] = !isOpen;
-    }
-
-    function toggleGroupBox(btn, id) {
-        const content = btn.closest('.group-box').querySelector('.group-content');
-        const isOpen = content.style.display === "block";
-        content.style.display = isOpen ? "none" : "block";
-        btn.innerText = isOpen ? "OPEN GROUP ▼" : "HIDE GROUP ▲";
-        openStates.groups[id] = !isOpen;
-    }
-
     function render() {
         const root = document.getElementById('app-root');
         root.innerHTML = '';
         levelsData.forEach((lv, lIdx) => {
             const div = document.createElement('div');
             div.className = 'level-card';
+            
+            // Collect hidden students for this level
+            let hiddenOnes = [];
+            (lv.groups || []).forEach((gp, gIdx) => {
+                (gp.children || []).forEach((st, sIdx) => {
+                    if(st.isArchived) hiddenOnes.push({ ...st, gIdx, sIdx });
+                });
+            });
+
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h2 style="margin:0; font-weight:900; color:var(--navy); font-size: 30px;">${lv.name}</h2>
-                    <button class="btn-navy" onclick="newGp(${lIdx})">+ NEW GROUP</button>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="margin:0; font-weight:900; color:var(--navy); font-size:32px;">${lv.name}</h2>
+                    <button class="btn-navy" onclick="newGp(${lIdx})">+ ADD GROUP</button>
                 </div>
                 ${(lv.groups || []).map((gp, gIdx) => {
                     const gpId = `${lv.id}-g-${gIdx}`;
                     const isGpOpen = openStates.groups[gpId];
                     return `
                     <div class="group-box">
-                        <div class="group-header">
-                            <span style="font-weight:900; color:var(--navy)">
-                                Group | <span style="color:var(--cyan)">${gp.day || '---'}</span> | <span style="color:var(--pink)">${gp.time || '---'}</span>
-                            </span>
-                            <button class="btn-toggle-gp" onclick="toggleGroupBox(this, '${gpId}')">
-                                ${isGpOpen ? 'HIDE GROUP ▲' : 'OPEN GROUP ▼'}
-                            </button>
-                        </div>
-                        
-                        <div class="group-content" style="display: ${isGpOpen ? 'block' : 'none'}">
-                            <div class="flex-row">
-                                <div class="field-wrap"><span class="lbl">Session Day</span><input type="text" value="${gp.day || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'day', this.value)"></div>
-                                <div class="field-wrap"><span class="lbl">Session Time</span><input type="text" value="${gp.time || ''}" onchange="upGp(${lIdx}, ${gIdx}, 'time', this.value)"></div>
-                                <button class="btn-cyan" onclick="newSt(${lIdx}, ${gIdx})">+ STUDENT</button>
-                                <button class="btn-delete" onclick="delGp(${lIdx}, ${gIdx})">DELETE GROUP</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="gp-info-pills" style="display:flex; gap:10px;">
+                                <div class="pill">📅 ${gp.day || '---'}</div>
+                                <div class="pill">⏰ ${gp.time || '---'}</div>
                             </div>
-                            ${(gp.children || []).map((st, sIdx) => {
+                            <div style="display:flex; gap:10px;">
+                                <button onclick="toggleBox('groups','${gpId}')" style="background:#e0f2fe; color:#0369a1; padding:0 15px; height:40px;">${isGpOpen ? 'HIDE' : 'OPEN'}</button>
+                                <button onclick="delGp(${lIdx},${gIdx})" class="btn-del" style="height:40px; width:40px;">✕</button>
+                            </div>
+                        </div>
+                        <div class="group-content" style="display:${isGpOpen ? 'block' : 'none'}">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:15px; margin-bottom:20px; align-items:end;">
+                                <div><span class="lbl">Group Day</span><input type="text" value="${gp.day||''}" onchange="upGp(${lIdx},${gIdx},'day',this.value)"></div>
+                                <div><span class="lbl">Group Time</span><input type="text" value="${gp.time||''}" onchange="upGp(${lIdx},${gIdx},'time',this.value)"></div>
+                                <button class="btn-cyan" onclick="newSt(${lIdx},${gIdx})">+ NEW STUDENT</button>
+                            </div>
+                            ${(gp.children || []).filter(st => !st.isArchived).map((st, sIdx) => {
                                 const stId = `${gpId}-s-${sIdx}`;
                                 const isStOpen = openStates.students[stId];
                                 return `
-                                <div class="student-card" style="background:white; padding:20px; border-radius:18px; margin-top:15px; border:1px solid #edf2f7;">
-                                    <div style="display: flex; align-items: flex-end; gap: 10px;">
-                                        <div class="field-wrap" style="flex: 1.2; min-width: 120px;">
-                                            <span class="lbl" style="color:var(--pink)">Student Name</span>
-                                            <input type="text" class="st-name-input" value="${st.name || ''}" onchange="upSt(${lIdx}, ${gIdx}, ${sIdx}, this.value)">
-                                        </div>
-                                        <button class="toggle-btn" style="flex: 1;" onclick="toggleSessions(this, '${stId}')">
-                                            ${isStOpen ? 'CLOSE SESSIONS ▲' : 'VIEW SESSIONS ▼'}
-                                        </button>
-                                        <button class="btn-delete" style="width:48px; padding:0; height:48px; flex:none;" onclick="delSt(${lIdx}, ${gIdx}, ${sIdx})">✕</button>
+                                <div style="background:#f1f5f9; padding:15px; border-radius:20px; margin-top:15px; border:1px solid #cbd5e1;">
+                                    <div style="display:flex; gap:8px; align-items:end;">
+                                        <div style="flex:2"><span class="lbl">Student Name</span><input type="text" value="${st.name||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'name',this.value)"></div>
+                                        <div style="flex:1"><span class="lbl">WhatsApp</span><input type="text" value="${st.phone||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'phone',this.value)"></div>
+                                        <button class="btn-share" onclick="shareFeedback(${lIdx},${gIdx},${sIdx})">SHARE</button>
+                                        <button class="btn-hide" onclick="hideStudent(${lIdx},${gIdx},${sIdx}, true)">HIDE</button>
+                                        <button class="btn-navy" style="height:50px;" onclick="toggleBox('students','${stId}')">${isStOpen ? '▲' : 'SESSIONS'}</button>
+                                        <button class="btn-del" onclick="delSt(${lIdx},${gIdx},${sIdx})">✕</button>
                                     </div>
-                                    <div class="sessions-container" style="display: ${isStOpen ? 'block' : 'none'}">
+                                    <div style="display:${isStOpen ? 'block' : 'none'}; margin-top:20px;">
                                         ${(st.sessions || []).map((ss, ssIdx) => `
                                             <div class="session-row">
-                                                <div class="session-badge">SESSION ${ssIdx+1}</div>
-                                                <input type="date" value="${ss.date || ''}" onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'date', this.value)">
-                                                <textarea placeholder="Notes..." onchange="upSess(${lIdx}, ${gIdx}, ${sIdx}, ${ssIdx}, 'feedback', this.value)">${ss.feedback || ''}</textarea>
+                                                <div style="font-weight:900; text-align:center;">S-${ssIdx+1}</div>
+                                                <input type="checkbox" style="width:25px;height:25px;margin:auto" ${ss.present ? 'checked' : ''} onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',this.checked)">
+                                                <input type="date" value="${ss.date||''}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'date',this.value)">
+                                                <textarea onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
+                                                <button class="btn-wa" onclick="sendWA(${lIdx},${gIdx},${sIdx},${ssIdx})">📲</button>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -199,6 +170,21 @@
                         </div>
                     </div>
                 `}).join('')}
+
+                <div style="margin-top:25px;">
+                    <button onclick="toggleBox('archives','${lv.id}')" style="background:none; color:#64748b; font-size:12px; font-weight:800; text-decoration:underline;">
+                        ${openStates.archives[lv.id] ? 'Hide Hidden List ▲' : 'Show Hidden Students ('+hiddenOnes.length+') ▼'}
+                    </button>
+                    <div class="archive-list" style="display:${openStates.archives[lv.id] ? 'block' : 'none'}">
+                        ${hiddenOnes.length === 0 ? '<p style="text-align:center; font-size:12px; color:#64748b;">No hidden students.</p>' : 
+                        hiddenOnes.map(st => `
+                            <div class="archive-item">
+                                <span style="font-weight:700; color:var(--navy);">${st.name}</span>
+                                <button onclick="hideStudent(${lIdx},${st.gIdx},${st.sIdx}, false)" style="background:var(--cyan); color:white; padding:5px 15px; font-size:11px;">RESTORE</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             `;
             root.appendChild(div);
         });
@@ -206,12 +192,32 @@
 
     const sync = (l) => db.collection('levels').doc(levelsData[l].id).set(levelsData[l]);
     function upGp(l, g, f, v) { levelsData[l].groups[g][f] = v; sync(l); }
-    function upSt(l, g, s, v) { levelsData[l].groups[g].children[s].name = v; sync(l); }
+    function upSt(l, g, s, f, v) { levelsData[l].groups[g].children[s][f] = v; sync(l); }
     function upSess(l, g, s, ss, f, v) { levelsData[l].groups[g].children[s].sessions[ss][f] = v; sync(l); }
-    function newGp(l) { if(!levelsData[l].groups) levelsData[l].groups = []; levelsData[l].groups.push({ day: '', time: '', children: [] }); sync(l); }
-    function newSt(l, g) { let ss = Array.from({length: 8}, () => ({ date: '', feedback: '' })); levelsData[l].groups[g].children.push({ name: '', sessions: ss }); sync(l); }
-    function delGp(l, g) { if(confirm("DELETE GROUP?")) { levelsData[l].groups.splice(g, 1); sync(l); } }
+    function newGp(l) { if(!levelsData[l].groups) levelsData[l].groups = []; levelsData[l].groups.push({ day:'', time:'', children:[] }); sync(l); }
+    function newSt(l, g) { let ss = Array.from({length: 8}, () => ({ date: '', feedback: '', present: true })); levelsData[l].groups[g].children.push({ name:'', phone:'', isArchived: false, sessions: ss }); sync(l); }
+    function delGp(l, g) { if(confirm("Delete Group?")) { levelsData[l].groups.splice(g, 1); sync(l); } }
     function delSt(l, g, s) { if(confirm("Delete Student?")) { levelsData[l].groups[g].children.splice(s, 1); sync(l); } }
+    function toggleBox(type, id) { openStates[type][id] = !openStates[type][id]; render(); }
+
+    function hideStudent(l, g, s, status) {
+        levelsData[l].groups[g].children[s].isArchived = status;
+        sync(l);
+    }
+
+    function shareFeedback(l, g, s) {
+        const st = levelsData[l].groups[g].children[s];
+        let report = `*E-Kidzy Report*%0A*Student:* ${st.name}%0A`;
+        st.sessions.forEach((ss, i) => { if(ss.feedback) report += `*S${i+1}:* ${ss.feedback}%0A`; });
+        window.open(`https://wa.me/2${st.phone}?text=${report}`, '_blank');
+    }
+
+    function sendWA(l, g, s, ssIdx) {
+        const st = levelsData[l].groups[g].children[s];
+        const ss = st.sessions[ssIdx];
+        const msg = `*E-Kidzy*%0A*Session:* ${ssIdx+1}%0A*Feedback:* ${ss.feedback || '---'}`;
+        window.open(`https://wa.me/2${st.phone}?text=${msg}`, '_blank');
+    }
 </script>
 </body>
 </html>
