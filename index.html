@@ -52,7 +52,7 @@
         .gp-input-small { width: 140px !important; }
         
         .student-container { background: #f8fafc; border: 1.5px solid #edf2f7; border-radius: 20px; padding: 18px; margin-top: 15px; }
-        .student-main-info { display: grid; grid-template-columns: 1.8fr 1.2fr auto auto auto; gap: 10px; align-items: end; }
+        .student-main-info { display: grid; grid-template-columns: 1.8fr 1.2fr auto auto auto auto; gap: 10px; align-items: end; }
 
         .session-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #e2e8f0; }
         .session-row { 
@@ -198,6 +198,7 @@
                                     <div><span class="lbl">Phone</span><input type="text" value="${st.phone||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'phone',this.value)"></div>
                                     <button class="btn-print" onclick="printStudentReport(${lIdx},${gIdx},${sIdx})">PRINT</button>
                                     <button class="btn-hide" onclick="hideStudent(${lIdx},${gIdx},${sIdx}, true)">HIDE</button>
+                                    <button class="btn-del" onclick="delSt(${lIdx},${gIdx},${sIdx})">✕</button>
                                     <button style="background:#fff; border:1px solid #ddd; padding:10px; border-radius:10px; font-weight:700;" onclick="toggleBox('students','${stId}')">${isStOpen ? '▲' : '▼ Sessions'}</button>
                                 </div>
                                 <div class="session-grid" style="display:${isStOpen ? 'grid' : 'none'};">
