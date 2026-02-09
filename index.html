@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Stable & Delete Feature</title>
+    <title>E-Kidzy | Professional Edition</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -56,20 +56,20 @@
         /* --- Feedback & Emojis --- */
         .feedback-container { flex: 3; display: flex; flex-direction: column; }
         textarea { 
-            height: 75px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
+            height: 80px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
             border-bottom: none; padding: 10px; font-size: 15px; direction: rtl; box-sizing: border-box; resize: none; font-family: inherit;
         }
         .emoji-bar { 
-            display: flex; gap: 10px; background: #fff; padding: 8px; 
+            display: flex; gap: 12px; background: #fff; padding: 8px; 
             border: 1.5px solid var(--border); border-radius: 0 0 12px 12px; overflow-x: auto;
         }
-        .emoji-item { font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .emoji-item { font-size: 24px; cursor: pointer; transition: 0.2s; user-select: none; }
+        .emoji-item:active { transform: scale(1.4); }
 
         .btn-wa { background: #22c55e; color: white; border: none; border-radius: 12px; min-width: 50px; height: 50px; font-size: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        /* زر الحذف الأحمر الصغير */
-        .btn-delete { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
-        .btn-delete:hover { color: var(--danger); transform: scale(1.2); }
+        .btn-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
+        .btn-delete:hover { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -151,8 +151,8 @@
                             return `
                             <div class="student-container">
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                    <div style="display:flex; align-items:center; gap:10px;">
-                                        <button class="btn-delete" title="Delete Student" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <button class="btn-delete" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
                                         <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
                                     </div>
                                     <div style="display:flex; gap:10px;">
@@ -196,20 +196,31 @@
         });
     }
 
-    // وظيفة حذف الطالب
+    // وظيفة إضافة الإيموجي في مكان القلم بالضبط
+    function addE(id, e, l, g, s, ss) {
+        const textarea = document.getElementById('tx-' + id);
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+
+        const newText = text.substring(0, start) + e + text.substring(end);
+        textarea.value = newText;
+
+        // وضع القلم بعد الإيموجي فوراً
+        const newPos = start + e.length;
+        textarea.setSelectionRange(newPos, newPos);
+        textarea.focus();
+
+        upSessSilent(l, g, s, ss, 'feedback', textarea.value);
+    }
+
     async function deleteStudent(lIdx, gIdx, sIdx) {
-        const studentName = levelsData[lIdx].groups[gIdx].children[sIdx].name;
-        if (confirm(`هل أنتِ متأكدة من حذف الطالب "${studentName}" نهائياً؟`)) {
+        const name = levelsData[lIdx].groups[gIdx].children[sIdx].name;
+        if (confirm(`هل أنتِ متأكدة من حذف الطالب "${name}"؟`)) {
             levelsData[lIdx].groups[gIdx].children.splice(sIdx, 1);
             await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
             render();
         }
-    }
-
-    function addE(id, e, l, g, s, ss) {
-        const a = document.getElementById('tx-'+id);
-        a.value += e;
-        upSessSilent(l, g, s, ss, 'feedback', a.value);
     }
 
     async function upSessSilent(l, g, s, ss, f, v) { 
