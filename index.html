@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Stable Typing Version</title>
+    <title>E-Kidzy | Stable & Delete Feature</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -53,7 +53,7 @@
         .date-box { min-width: 150px; }
         .input-date { width: 100%; height: 45px; border-radius: 10px; border: 2px solid var(--border); padding: 0 8px; font-size: 15px; font-weight: 600; font-family: inherit; }
 
-        /* --- Feedback & Emojis Combined --- */
+        /* --- Feedback & Emojis --- */
         .feedback-container { flex: 3; display: flex; flex-direction: column; }
         textarea { 
             height: 75px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
@@ -64,9 +64,12 @@
             border: 1.5px solid var(--border); border-radius: 0 0 12px 12px; overflow-x: auto;
         }
         .emoji-item { font-size: 22px; cursor: pointer; transition: 0.2s; }
-        .emoji-item:hover { transform: scale(1.3); }
 
         .btn-wa { background: #22c55e; color: white; border: none; border-radius: 12px; min-width: 50px; height: 50px; font-size: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        /* زر الحذف الأحمر الصغير */
+        .btn-delete { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
+        .btn-delete:hover { color: var(--danger); transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -105,7 +108,7 @@
 
     let levelsData = [];
     let openStates = { groups: {}, students: {} };
-    let isTyping = false; // متغير لمنع التحديث التلقائي أثناء الكتابة
+    let isTyping = false; 
 
     function checkPass() {
         if (document.getElementById('pass-field').value === "123") {
@@ -117,7 +120,6 @@
 
     function init() {
         db.collection('levels').orderBy('index').onSnapshot(snap => {
-            // لا تقم بتحديث الواجهة إذا كانت المستخدمة تكتب حالياً
             if (!isTyping) {
                 levelsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
@@ -149,7 +151,10 @@
                             return `
                             <div class="student-container">
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                    <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <button class="btn-delete" title="Delete Student" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
+                                        <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
+                                    </div>
                                     <div style="display:flex; gap:10px;">
                                         <button class="status-btn status-present" style="background:#6366f1; font-size:12px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print 🖨️</button>
                                         <button class="status-btn status-present" style="background:var(--cyan); font-size:12px;" onclick="toggleBox('students','${stId}')">${stOpen?'Hide':'Sessions'}</button>
@@ -159,26 +164,21 @@
                                     ${(st.sessions || []).map((ss, ssIdx) => `
                                         <div class="session-row">
                                             <div style="font-weight:800;">S${ssIdx+1}</div>
-                                            
                                             <div class="attendance-box">
                                                 <button class="status-btn ${ss.present?'status-present':'status-absent'}" onclick="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',true)">حضور</button>
                                                 <button class="status-btn ${!ss.present?'status-is-absent':'status-absent'}" onclick="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',false)">غياب</button>
                                             </div>
-
                                             <div class="date-box">
                                                 <input type="date" class="input-date" value="${ss.date||''}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'date',this.value)">
                                             </div>
-
                                             <div class="feedback-container">
                                                 <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." 
-                                                    onfocus="isTyping=true" 
-                                                    onblur="isTyping=false"
+                                                    onfocus="isTyping=true" onblur="isTyping=false"
                                                     oninput="upSessSilent(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
                                                 <div class="emoji-bar">
                                                     ${['❤️','💖','👏','👦','👧','🌟','💪','✅'].map(e => `<span class="emoji-item" onclick="addE('${lIdx}-${gIdx}-${sIdx}-${ssIdx}','${e}',${lIdx},${gIdx},${sIdx},${ssIdx})">${e}</span>`).join('')}
                                                 </div>
                                             </div>
-
                                             <button class="btn-wa" onclick="sendWA(${lIdx},${gIdx},${sIdx},${ssIdx})">📲</button>
                                         </div>
                                     `).join('')}
@@ -196,19 +196,27 @@
         });
     }
 
+    // وظيفة حذف الطالب
+    async function deleteStudent(lIdx, gIdx, sIdx) {
+        const studentName = levelsData[lIdx].groups[gIdx].children[sIdx].name;
+        if (confirm(`هل أنتِ متأكدة من حذف الطالب "${studentName}" نهائياً؟`)) {
+            levelsData[lIdx].groups[gIdx].children.splice(sIdx, 1);
+            await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+            render();
+        }
+    }
+
     function addE(id, e, l, g, s, ss) {
         const a = document.getElementById('tx-'+id);
         a.value += e;
         upSessSilent(l, g, s, ss, 'feedback', a.value);
     }
 
-    // تحديث البيانات دون إعادة تحميل الواجهة
     async function upSessSilent(l, g, s, ss, f, v) { 
         levelsData[l].groups[g].children[s].sessions[ss][f] = v; 
         await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
     }
 
-    // تحديث البيانات مع إمكانية إعادة تحميل الواجهة (للأزرار والتاريخ)
     async function upSess(l, g, s, ss, f, v) { 
         levelsData[l].groups[g].children[s].sessions[ss][f] = v; 
         await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
