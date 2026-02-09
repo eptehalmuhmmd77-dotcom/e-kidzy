@@ -1,99 +1,94 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Management Portal</title>
+    <title>E-Kidzy | Pro Management</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
         
         :root { 
-            --navy: #0f172a; 
-            --cyan: #0ea5e9; 
-            --pink: #f43f5e; 
-            --bg-page: #f1f5f9; 
-            --white: #ffffff;
-            --border: #e2e8f0;
-            --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --navy: #1b2a4e; --cyan: #00a1df; --pink: #e91e63; 
+            --bg-page: #f4f7fa; --white: #ffffff; --border: #e2e8f0;
+            --text-main: #2d3748;
         }
         
-        body { font-family: 'Tajawal', sans-serif; margin: 0; background-color: var(--bg-page); color: var(--navy); }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-page); color: var(--navy); }
 
-        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--navy); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-box { background: var(--white); padding: 50px 40px; border-radius: 30px; text-align: center; width: 360px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
-        .login-box h1 { color: var(--navy); font-weight: 900; font-size: 35px; margin-bottom: 25px; letter-spacing: 2px; }
-        .login-box input { width: 100%; height: 50px; border-radius: 12px; border: 2px solid #f1f5f9; margin-bottom: 20px; text-align: center; font-size: 18px; box-sizing: border-box; }
-        .btn-login { width: 100%; height: 50px; background: var(--pink); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; }
+        /* --- Login --- */
+        #lock-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--navy), var(--cyan)); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: var(--white); padding: 40px; border-radius: 24px; text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .login-box input { width: 100%; height: 50px; border-radius: 12px; border: 2px solid #eee; text-align: center; margin-bottom: 20px; font-size: 16px; box-sizing: border-box; }
+        .btn-login { width: 100%; height: 50px; background: var(--pink); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        .main-header { background: var(--navy); padding: 40px 20px; text-align: center; color: white; }
-        .brand-name { font-size: 42px; font-weight: 900; margin: 0; }
-        
-        .search-container { max-width: 800px; margin: -30px auto 30px; padding: 0 20px; }
-        #search-input { width: 100%; height: 60px; font-size: 17px; border-radius: 18px; border: none; padding: 0 25px; box-shadow: var(--shadow); outline: none; }
+        /* --- Layout --- */
+        .main-header { background: var(--navy); padding: 30px; text-align: center; color: white; }
+        .search-container { max-width: 800px; margin: -25px auto 20px; padding: 0 20px; }
+        #search-input { width: 100%; height: 55px; border-radius: 15px; border: none; padding: 0 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); font-size: 16px; box-sizing: border-box; outline: none; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        
-        .level-card { background: var(--white); border-radius: 24px; padding: 30px; margin-bottom: 40px; box-shadow: var(--shadow); border-top: 8px solid var(--cyan); }
-        .level-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .level-title { font-size: 28px; font-weight: 900; color: var(--navy); margin: 0; }
+        /* --- Cards & Balanced Layout --- */
+        .level-card { background: var(--white); border-radius: 20px; padding: 25px; margin-bottom: 30px; border-top: 6px solid var(--cyan); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .group-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-top: 15px; }
+        .student-container { background: white; border: 1px solid var(--border); border-radius: 15px; padding: 18px; margin-top: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-        .group-box { background: #ffffff; border: 1px solid var(--border); border-radius: 22px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .group-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .pill { background: #f8fafc; padding: 8px 15px; border-radius: 10px; font-size: 14px; font-weight: 900; border: 1.5px solid var(--border); color: var(--navy); }
+        .student-row-header { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .input-name { flex: 2; font-weight: 600; color: var(--text-main); font-size: 15px; min-width: 200px; }
+        .input-phone { flex: 1; font-weight: 500; color: var(--cyan); letter-spacing: 0.5px; min-width: 140px; }
 
-        .lbl { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        input[type="text"], input[type="date"], textarea, select { 
-            background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 14px; 
-            font-family: 'Tajawal'; font-size: 14px; width: 100%; box-sizing: border-box; font-weight: 600;
-        }
-
-        .gp-input-small { width: 140px !important; }
-        
-        .student-container { background: #f8fafc; border: 1.5px solid #edf2f7; border-radius: 20px; padding: 18px; margin-top: 15px; }
-        .student-main-info { display: grid; grid-template-columns: 1.8fr 1.2fr auto auto auto auto; gap: 10px; align-items: end; }
-
-        .session-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #e2e8f0; }
+        /* --- Sessions --- */
         .session-row { 
-            display: grid; grid-template-columns: 60px 125px 140px 1fr auto auto; gap: 10px; 
-            align-items: center; background: #ffffff; padding: 12px 15px; border-radius: 16px; border: 1px solid #edf2f7;
+            display: grid; grid-template-columns: 100px 50px 140px 1fr 50px; gap: 12px; 
+            align-items: center; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 10px;
         }
+        .attendance-label { font-size: 10px; font-weight: 800; text-align: center; color: #64748b; margin-bottom: 2px; }
 
-        button { font-family: 'Tajawal'; cursor: pointer; transition: 0.2s; border: none; }
-        .btn-navy { background: var(--navy); color: white; padding: 12px 22px; border-radius: 12px; font-weight: 800; }
-        .btn-cyan { background: var(--cyan); color: white; padding: 12px 22px; border-radius: 12px; font-weight: 800; }
-        .btn-print { background: #e0f2fe; color: #0369a1; padding: 10px 15px; border-radius: 10px; font-weight: 800; font-size: 13px; }
-        .btn-hide { background: #f1f5f9; color: #64748b; padding: 10px 15px; border-radius: 10px; font-weight: 800; font-size: 13px; }
-        .btn-del { background: #fff1f2; color: var(--pink); width: 40px; height: 40px; border-radius: 10px; font-weight: bold; }
-        .btn-wa { background: #22c55e; color: white; width: 40px; height: 40px; border-radius: 10px; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        input, textarea { border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; font-family: 'Poppins', sans-serif; font-size: 14px; box-sizing: border-box; }
+        textarea { height: 60px; resize: none; unicode-bidi: plaintext; text-align: right; direction: rtl; width: 100%; }
 
-        .group-archive-area { margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px; }
-        .group-archive-header { background: #f1f5f9; color: #64748b; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; display: inline-block; font-size: 12px; }
-        .archived-student { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 10px; margin-top: 8px; border: 1px dashed #cbd5e1; }
+        .emoji-bar { display: flex; gap: 8px; margin-top: 5px; background: white; padding: 6px 12px; border-radius: 8px; border: 1px solid #eee; }
+        .emoji-item { cursor: pointer; font-size: 18px; transition: 0.2s; }
 
-        @media (max-width: 900px) {
-            .student-main-info { grid-template-columns: 1fr; }
-            .session-row { grid-template-columns: 1fr; }
-            .gp-input-small { width: 100% !important; }
+        .btn-wa { background: #22c55e; color: white; border: none; border-radius: 10px; height: 45px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-print { background: #6366f1; color: white; border: none; border-radius: 10px; padding: 10px 15px; cursor: pointer; font-weight: 600; font-size: 12px; margin-left: 5px; }
+        .btn-cyan { background: var(--cyan); color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        
+        @media (max-width: 768px) { .session-row { grid-template-columns: 1fr; } .student-row-header { flex-direction: column; align-items: stretch; } }
+
+        /* --- Print CSS --- */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; direction: rtl; }
+            .no-print { display: none !important; }
         }
-    </style></head><body><div id="lock-screen">
+    </style>
+</head>
+<body>
+
+<div id="lock-screen">
     <div class="login-box">
-        <h1>E-KIDZY</h1>
-        <input type="password" id="pass-field" placeholder="Enter Password">
+        <h1 style="color:var(--navy); margin-top:0;">E-KIDZY</h1>
+        <input type="password" id="pass-field" placeholder="Access Password">
         <button onclick="checkPass()" class="btn-login">LOG IN</button>
-    </div></div><div id="main-content" style="display:none;">
-    <header class="main-header">
-        <h1 class="brand-name">E-KIDZY</h1>
-    </header>
-
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="🔍 Search student name or phone..." onkeyup="render()">
     </div>
+</div>
 
-    <div class="container">
-        <div id="app-root"></div>
-    </div></div><script>
+<div id="main-content" style="display:none;">
+    <header class="main-header"><h1>E-KIDZY</h1></header>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="🔍 Search students by name..." onkeyup="render()">
+    </div>
+    <div class="container" id="app-root"></div>
+</div>
+
+<div id="print-area"></div>
+
+<script>
     const firebaseConfig = {
         apiKey: "AIzaSyA4xrUfRfaqxueJvJrS3NBIGfowaqrLSu8",
         authDomain: "e-kidzy.firebaseapp.com",
@@ -102,117 +97,82 @@
         messagingSenderId: "776875497544",
         appId: "1:776875497544:web:807e8e9ab92e167794a07d"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    db.enablePersistence().catch(() => {}); 
 
     let levelsData = [];
-    let openStates = { groups: {}, students: {}, archives: {}, levels: {} };
+    let openStates = { groups: {}, students: {} };
 
     function checkPass() {
-        const inputPass = document.getElementById('pass-field').value;
-        if (inputPass === "123") {
+        if (document.getElementById('pass-field').value === "123") {
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-            init(); 
-        } else { alert("Incorrect Password!"); }
+            init();
+        } else { alert("Wrong Password"); }
     }
 
     function init() {
         db.collection('levels').orderBy('index').onSnapshot(snap => {
-            levelsData = [];
-            snap.forEach(doc => levelsData.push({ id: doc.id, ...doc.data() }));
+            levelsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             render();
         });
     }
 
     function render() {
         const root = document.getElementById('app-root');
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const search = document.getElementById('search-input').value.toLowerCase();
         root.innerHTML = '';
 
         levelsData.forEach((lv, lIdx) => {
-            const isLvHidden = openStates.levels[lv.id];
-            let hasMatchInLevel = false;
-
             const groupsHTML = (lv.groups || []).map((gp, gIdx) => {
                 const gpId = `${lv.id}-g-${gIdx}`;
-                
-                let gpArchivedList = [];
-                (gp.children || []).forEach((st, sIdx) => {
-                    if(st.isArchived) gpArchivedList.push({ ...st, sIdx });
-                });
-
-                const filteredSts = (gp.children || []).filter(st => {
-                    if(st.isArchived) return false;
-                    return st.name.toLowerCase().includes(searchTerm) || (st.phone && st.phone.includes(searchTerm));
-                });
-
-                if (searchTerm !== "" && filteredSts.length === 0) return "";
-                hasMatchInLevel = true;
-                const isGpOpen = searchTerm !== "" ? true : openStates.groups[gpId];
-                const isArchOpen = openStates.archives[gpId];
+                const isOpen = search !== "" ? true : openStates.groups[gpId];
 
                 return `
                 <div class="group-box">
-                    <div class="group-top-bar">
-                        <div style="display:flex; gap:10px;">
-                            <div class="pill">📅 ${gp.day || 'Day'}</div>
-                            <div class="pill">⏰ ${gp.time || 'Time'}</div>
-                        </div>
-                        <div style="display:flex; gap:8px;">
-                            <button onclick="toggleBox('groups','${gpId}')" class="btn-hide">${isGpOpen ? 'HIDE' : 'OPEN'}</button>
-                            <button onclick="delGp(${lIdx},${gIdx})" class="btn-del">✕</button>
-                        </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span style="font-weight:700;">📅 ${gp.day||'--'} | ⏰ ${gp.time||'--'}</span>
+                        <button class="btn-cyan" onclick="toggleBox('groups','${gpId}')">${isOpen?'Close Group':'Open Group'}</button>
                     </div>
-                    <div style="display:${isGpOpen ? 'block' : 'none'}">
-                        <div style="display:flex; gap:12px; margin-bottom:15px; align-items:end; flex-wrap:wrap;">
-                            <div class="gp-input-small"><span class="lbl">Day</span><input type="text" style="font-weight:700;" value="${gp.day||''}" onchange="upGp(${lIdx},${gIdx},'day',this.value)"></div>
-                            <div class="gp-input-small"><span class="lbl">Time</span><input type="text" style="font-weight:700;" value="${gp.time||''}" onchange="upGp(${lIdx},${gIdx},'time',this.value)"></div>
-                            <button class="btn-cyan" style="height:42px; padding:0 15px;" onclick="newSt(${lIdx},${gIdx})">+ NEW STUDENT</button>
-                            <button class="btn-hide" style="height:42px; background:#cbd5e1; color:#334155;" onclick="toggleBox('archives','${gpId}')">📦 ARCHIVE (${gpArchivedList.length})</button>
+                    <div style="display:${isOpen?'block':'none'}">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; margin-bottom:20px;">
+                            <input type="text" placeholder="Day" value="${gp.day||''}" onchange="upGp(${lIdx},${gIdx},'day',this.value)">
+                            <input type="text" placeholder="Time" value="${gp.time||''}" onchange="upGp(${lIdx},${gIdx},'time',this.value)">
+                            <button class="btn-cyan" style="background:var(--navy)" onclick="newSt(${lIdx},${gIdx})">+ Add Student</button>
                         </div>
-
-                        <div class="group-archive-area" style="display:${isArchOpen ? 'block' : 'none'}; background:#f8fafc; padding:10px; border-radius:15px; margin-bottom:15px;">
-                            <div style="font-weight:900; font-size:12px; color:#64748b; margin-bottom:5px;">ARCHIVED STUDENTS</div>
-                            ${gpArchivedList.length === 0 ? '<div style="font-size:12px; color:#94a3b8;">No archived students</div>' : gpArchivedList.map(ast => `
-                                <div class="archived-student">
-                                    <span style="font-weight:700;">${ast.name || 'Unnamed'}</span>
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn-cyan" style="padding:4px 10px; font-size:11px;" onclick="hideStudent(${lIdx},${gIdx},${ast.sIdx}, false)">RESTORE</button>
-                                        <button class="btn-del" style="width:28px; height:28px; font-size:12px;" onclick="delSt(${lIdx},${gIdx},${ast.sIdx})">✕</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-
                         ${(gp.children || []).map((st, sIdx) => {
-                            if(st.isArchived) return "";
-                            if(!st.name.toLowerCase().includes(searchTerm) && !(st.phone && st.phone.includes(searchTerm))) return "";
+                            if(st.isArchived && search === "") return "";
                             const stId = `${gpId}-s-${sIdx}`;
-                            const isStOpen = openStates.students[stId];
-
+                            const stOpen = openStates.students[stId];
                             return `
                             <div class="student-container">
-                                <div class="student-main-info">
-                                    <div><span class="lbl">Student Name</span><input type="text" value="${st.name||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'name',this.value)"></div>
-                                    <div><span class="lbl">Phone</span><input type="text" value="${st.phone||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'phone',this.value)"></div>
-                                    <button class="btn-print" onclick="printStudentReport(${lIdx},${gIdx},${sIdx})">PRINT</button>
-                                    <button class="btn-hide" onclick="hideStudent(${lIdx},${gIdx},${sIdx}, true)">HIDE</button>
-                                    <button class="btn-del" onclick="delSt(${lIdx},${gIdx},${sIdx})">✕</button>
-                                    <button style="background:#fff; border:1px solid #ddd; padding:10px; border-radius:10px; font-weight:700;" onclick="toggleBox('students','${stId}')">${isStOpen ? '▲' : '▼ Sessions'}</button>
+                                <div class="student-row-header">
+                                    <input type="text" class="input-name" value="${st.name||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'name',this.value)">
+                                    <input type="text" class="input-phone" value="${st.phone||''}" onchange="upSt(${lIdx},${gIdx},${sIdx},'phone',this.value)">
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn-print" onclick="printStudentReport(${lIdx},${gIdx},${sIdx})">Print Report 🖨️</button>
+                                        <button class="btn-cyan" onclick="toggleBox('students','${stId}')">${stOpen?'Hide':'Sessions'}</button>
+                                        <button style="background:#fff1f2; color:#e11d48; border:none; border-radius:10px; padding:0 12px;" onclick="delSt(${lIdx},${gIdx},${sIdx})">✕</button>
+                                    </div>
                                 </div>
-                                <div class="session-grid" style="display:${isStOpen ? 'grid' : 'none'};">
+                                <div style="display:${stOpen?'block':'none'}; margin-top:20px;">
                                     ${(st.sessions || []).map((ss, ssIdx) => `
                                         <div class="session-row">
-                                            <div style="font-weight:900; color:#64748b; font-size:12px;">S ${ssIdx+1}</div>
-                                            <select onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present', this.value === 'true')" style="font-weight:800;">
-                                                <option value="true" ${ss.present ? 'selected' : ''}>Present ✅</option>
-                                                <option value="false" ${!ss.present ? 'selected' : ''}>Absent ❌</option>
-                                            </select>
+                                            <b>Session ${ssIdx+1}</b>
+                                            <div style="text-align:center;">
+                                                <div class="attendance-label">${ss.present?'Present':'Absent'}</div>
+                                                <input type="checkbox" ${ss.present?'checked':''} onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',this.checked)">
+                                            </div>
                                             <input type="date" value="${ss.date||''}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'date',this.value)">
-                                            <textarea placeholder="Feedback..." onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)" style="height: 42px;">${ss.feedback||''}</textarea>
+                                            <div>
+                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
+                                                <div class="emoji-bar">
+                                                    ${['❤️','💖','👏','👦','👧','🌟','💪','✅'].map(e => `<span class="emoji-item" onclick="addEmoji('${lIdx}-${gIdx}-${sIdx}-${ssIdx}','${e}',${lIdx},${gIdx},${sIdx},${ssIdx})">${e}</span>`).join('')}
+                                                </div>
+                                            </div>
                                             <button class="btn-wa" onclick="sendWA(${lIdx},${gIdx},${sIdx},${ssIdx})">📲</button>
-                                            <button class="btn-del" style="width:35px; height:40px; font-size:12px;" onclick="delSess(${lIdx},${gIdx},${sIdx},${ssIdx})">✕</button>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -222,54 +182,75 @@
                 </div>`;
             }).join('');
 
-            if(searchTerm !== "" && !hasMatchInLevel) return;
-
             const div = document.createElement('div');
             div.className = 'level-card';
-            div.innerHTML = `
-                <div class="level-header">
-                    <h2 class="level-title">${lv.name}</h2>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-hide" onclick="toggleBox('levels','${lv.id}')">${isLvHidden ? 'SHOW' : 'HIDE'}</button>
-                        <button class="btn-navy" onclick="newGp(${lIdx})">+ ADD GROUP</button>
-                    </div>
-                </div>
-                <div style="display:${isLvHidden ? 'none' : 'block'}">
-                    ${groupsHTML}
-                </div>`;
+            div.innerHTML = `<h2>${lv.name}</h2>` + groupsHTML;
             root.appendChild(div);
         });
     }
 
-    const sync = (l) => db.collection('levels').doc(levelsData[l].id).set(levelsData[l]);
+    function printStudentReport(l, g, s) {
+        const lv = levelsData[l];
+        const st = lv.groups[g].children[s];
+        let sessionsHtml = st.sessions.map((ss, i) => `
+            <tr>
+                <td style="border:1px solid #ddd; padding:8px;">Session ${i+1}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${ss.date || '---'}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${ss.present ? 'Present ✅' : 'Absent ❌'}</td>
+                <td style="border:1px solid #ddd; padding:8px; direction:rtl;">${ss.feedback || '---'}</td>
+            </tr>
+        `).join('');
+
+        const printArea = document.getElementById('print-area');
+        printArea.innerHTML = `
+            <div style="padding:40px; font-family:Arial;">
+                <h1 style="text-align:center; color:#1b2a4e;">E-KIDZY Student Progress Report</h1>
+                <hr>
+                <p><strong>Student Name:</strong> ${st.name}</p>
+                <p><strong>Level:</strong> ${lv.name}</p>
+                <p><strong>Phone:</strong> ${st.phone}</p>
+                <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+                    <thead>
+                        <tr style="background:#f4f7fa;">
+                            <th style="border:1px solid #ddd; padding:10px;">Session</th>
+                            <th style="border:1px solid #ddd; padding:10px;">Date</th>
+                            <th style="border:1px solid #ddd; padding:10px;">Attendance</th>
+                            <th style="border:1px solid #ddd; padding:10px;">Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>${sessionsHtml}</tbody>
+                </table>
+            </div>
+        `;
+        window.print();
+    }
+
+    function addEmoji(id, emoji, l, g, s, ss) {
+        const area = document.getElementById('tx-'+id);
+        area.value += emoji;
+        upSess(l, g, s, ss, 'feedback', area.value);
+    }
+
+    async function sync(l) {
+        await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
+    }
+
     function upGp(l, g, f, v) { levelsData[l].groups[g][f] = v; sync(l); }
     function upSt(l, g, s, f, v) { levelsData[l].groups[g].children[s][f] = v; sync(l); }
     function upSess(l, g, s, ss, f, v) { levelsData[l].groups[g].children[s].sessions[ss][f] = v; sync(l); }
-    function newGp(l) { if(!levelsData[l].groups) levelsData[l].groups = []; levelsData[l].groups.push({ day:'', time:'', children:[] }); sync(l); }
-    function newSt(l, g) { let ss = Array.from({length: 8}, () => ({ date: '', feedback: '', present: true })); if(!levelsData[l].groups[g].children) levelsData[l].groups[g].children = []; levelsData[l].groups[g].children.push({ name:'', phone:'', isArchived: false, sessions: ss }); sync(l); }
-    function delGp(l, g) { if(confirm("Delete Group?")) { levelsData[l].groups.splice(g, 1); sync(l); } }
-    function delSt(l, g, s) { if(confirm("Delete Student?")) { levelsData[l].groups[g].children.splice(s, 1); sync(l); } }
-    function delSess(l, g, s, ss) { if(confirm("Delete this session?")) { levelsData[l].groups[g].children[s].sessions.splice(ss, 1); sync(l); } }
-    function toggleBox(type, id) { openStates[type][id] = !openStates[type][id]; render(); }
-    function hideStudent(l, g, s, status) { levelsData[l].groups[g].children[s].isArchived = status; sync(l); }
-
-    function printStudentReport(l, g, s) {
-        const st = levelsData[l].groups[g].children[s];
-        const levelName = levelsData[l].name;
-        let rows = '';
-        st.sessions.forEach((ss, i) => {
-            if(ss.feedback || ss.date) {
-                rows += `<tr><td>Session ${i+1}</td><td>${ss.date || '---'}</td><td>${ss.present ? '✅' : '❌'}</td><td style="white-space: pre-wrap;">${ss.feedback || '---'}</td></tr>`;
-            }
-        });
-        const win = window.open('', '_blank');
-        win.document.write(`<html><head><style>body{font-family:'Tajawal', sans-serif;padding:40px;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #ddd;padding:12px;text-align:left;}th{background:#f8fafc;}</style></head><body><h1 style="text-align:center;">E-KIDZY REPORT</h1><p><b>Student:</b> ${st.name} | <b>Level:</b> ${levelName}</p><table><thead><tr><th>Session</th><th>Date</th><th>Status</th><th>Feedback</th></tr></thead><tbody>${rows}</tbody></table><script>window.onload=function(){window.print();window.close();}<\/script></body></html>`);
-        win.document.close();
+    function newSt(l, g) { 
+        let ss = Array.from({length: 8}, () => ({ date: '', feedback: '', present: true }));
+        levelsData[l].groups[g].children.push({ name:'', phone:'', isArchived: false, sessions: ss }); sync(l); 
     }
+    function delSt(l, g, s) { if(confirm("Are you sure?")) { levelsData[l].groups[g].children.splice(s, 1); sync(l); } }
+    function toggleBox(type, id) { openStates[type][id] = !openStates[type][id]; render(); }
 
     function sendWA(l, g, s, ssIdx) {
         const st = levelsData[l].groups[g].children[s];
         const ss = st.sessions[ssIdx];
-        const msg = `*E-Kidzy Progress Report*%0A*Session:* ${ssIdx+1}%0A*Status:* ${ss.present ? 'Present ✅' : 'Absent ❌'}%0A*Feedback:* ${ss.feedback || '---'}`;
-        window.open(`https://wa.me/2${st.phone}?text=${msg}`, '_blank');
-    }</script></body></html>
+        const msg = `*E-Kidzy Progress Report*\n*Session:* ${ssIdx+1}\n*Status:* ${ss.present ? 'Present ✅' : 'Absent ❌'}\n*Feedback:* ${ss.feedback || '---'}`;
+        window.open(`https://wa.me/2${st.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+</script>
+</body>
+</html>
