@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Final Secure Version</title>
+    <title>E-Kidzy | Stable Typing Version</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -101,12 +101,11 @@
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    
-    // تفعيل الحفظ المحلي (Persistence)
-    db.enablePersistence().catch(err => console.error("Offline mode error", err));
+    db.enablePersistence().catch(err => console.error(err));
 
     let levelsData = [];
     let openStates = { groups: {}, students: {} };
+    let isTyping = false; // متغير لمنع التحديث التلقائي أثناء الكتابة
 
     function checkPass() {
         if (document.getElementById('pass-field').value === "123") {
@@ -118,8 +117,11 @@
 
     function init() {
         db.collection('levels').orderBy('index').onSnapshot(snap => {
-            levelsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            render();
+            // لا تقم بتحديث الواجهة إذا كانت المستخدمة تكتب حالياً
+            if (!isTyping) {
+                levelsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render();
+            }
         });
     }
 
@@ -168,7 +170,10 @@
                                             </div>
 
                                             <div class="feedback-container">
-                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." oninput="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
+                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." 
+                                                    onfocus="isTyping=true" 
+                                                    onblur="isTyping=false"
+                                                    oninput="upSessSilent(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
                                                 <div class="emoji-bar">
                                                     ${['❤️','💖','👏','👦','👧','🌟','💪','✅'].map(e => `<span class="emoji-item" onclick="addE('${lIdx}-${gIdx}-${sIdx}-${ssIdx}','${e}',${lIdx},${gIdx},${sIdx},${ssIdx})">${e}</span>`).join('')}
                                                 </div>
@@ -194,16 +199,20 @@
     function addE(id, e, l, g, s, ss) {
         const a = document.getElementById('tx-'+id);
         a.value += e;
-        upSess(l, g, s, ss, 'feedback', a.value);
+        upSessSilent(l, g, s, ss, 'feedback', a.value);
     }
 
-    async function sync(l) {
+    // تحديث البيانات دون إعادة تحميل الواجهة
+    async function upSessSilent(l, g, s, ss, f, v) { 
+        levelsData[l].groups[g].children[s].sessions[ss][f] = v; 
         await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
     }
 
-    function upSess(l, g, s, ss, f, v) { 
+    // تحديث البيانات مع إمكانية إعادة تحميل الواجهة (للأزرار والتاريخ)
+    async function upSess(l, g, s, ss, f, v) { 
         levelsData[l].groups[g].children[s].sessions[ss][f] = v; 
-        sync(l); 
+        await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
+        render(); 
     }
     
     function toggleBox(type, id) { openStates[type][id] = !openStates[type][id]; render(); }
