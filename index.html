@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Professional Edition</title>
+    <title>E-Kidzy | Editable Phone Edition</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -64,12 +64,20 @@
             border: 1.5px solid var(--border); border-radius: 0 0 12px 12px; overflow-x: auto;
         }
         .emoji-item { font-size: 24px; cursor: pointer; transition: 0.2s; user-select: none; }
-        .emoji-item:active { transform: scale(1.4); }
 
         .btn-wa { background: #22c55e; color: white; border: none; border-radius: 12px; min-width: 50px; height: 50px; font-size: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
         .btn-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
         .btn-delete:hover { color: var(--danger); }
+        
+        /* شكل خانة تعديل الرقم */
+        .phone-input { 
+            background: #e2e8f0; border: none; color: #475569; 
+            padding: 2px 8px; border-radius: 6px; font-size: 12px; 
+            font-weight: 600; width: 110px; outline: none;
+            font-family: inherit;
+        }
+        .phone-input:focus { background: #cbd5e1; color: var(--navy); }
     </style>
 </head>
 <body>
@@ -153,7 +161,15 @@
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <button class="btn-delete" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
-                                        <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
+                                        <div style="display:flex; flex-direction:column;">
+                                            <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
+                                            <div style="display:flex; align-items:center; gap:4px;">
+                                                <span style="font-size:12px;">📞</span>
+                                                <input type="text" class="phone-input" value="${st.phone||''}" 
+                                                    onfocus="isTyping=true" onblur="isTyping=false"
+                                                    oninput="updatePhone(${lIdx},${gIdx},${sIdx},this.value)">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div style="display:flex; gap:10px;">
                                         <button class="status-btn status-present" style="background:#6366f1; font-size:12px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print 🖨️</button>
@@ -196,21 +212,22 @@
         });
     }
 
-    // وظيفة إضافة الإيموجي في مكان القلم بالضبط
+    // وظيفة تحديث رقم الهاتف
+    async function updatePhone(lIdx, gIdx, sIdx, newPhone) {
+        levelsData[lIdx].groups[gIdx].children[sIdx].phone = newPhone;
+        await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+    }
+
     function addE(id, e, l, g, s, ss) {
         const textarea = document.getElementById('tx-' + id);
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const text = textarea.value;
-
         const newText = text.substring(0, start) + e + text.substring(end);
         textarea.value = newText;
-
-        // وضع القلم بعد الإيموجي فوراً
         const newPos = start + e.length;
         textarea.setSelectionRange(newPos, newPos);
         textarea.focus();
-
         upSessSilent(l, g, s, ss, 'feedback', textarea.value);
     }
 
