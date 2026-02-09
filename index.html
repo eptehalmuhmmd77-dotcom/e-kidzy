@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Kidzy | Final Version</title>
+    <title>E-Kidzy | Final Secure Version</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -56,7 +56,7 @@
         /* --- Feedback & Emojis Combined --- */
         .feedback-container { flex: 3; display: flex; flex-direction: column; }
         textarea { 
-            height: 70px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
+            height: 75px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
             border-bottom: none; padding: 10px; font-size: 15px; direction: rtl; box-sizing: border-box; resize: none; font-family: inherit;
         }
         .emoji-bar { 
@@ -101,7 +101,9 @@
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    db.enablePersistence();
+    
+    // تفعيل الحفظ المحلي (Persistence)
+    db.enablePersistence().catch(err => console.error("Offline mode error", err));
 
     let levelsData = [];
     let openStates = { groups: {}, students: {} };
@@ -166,7 +168,7 @@
                                             </div>
 
                                             <div class="feedback-container">
-                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
+                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." oninput="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
                                                 <div class="emoji-bar">
                                                     ${['❤️','💖','👏','👦','👧','🌟','💪','✅'].map(e => `<span class="emoji-item" onclick="addE('${lIdx}-${gIdx}-${sIdx}-${ssIdx}','${e}',${lIdx},${gIdx},${sIdx},${ssIdx})">${e}</span>`).join('')}
                                                 </div>
