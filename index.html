@@ -70,7 +70,6 @@
         .btn-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
         .btn-delete:hover { color: var(--danger); }
         
-        /* شكل خانة تعديل الرقم */
         .phone-input { 
             background: #e2e8f0; border: none; color: #475569; 
             padding: 2px 8px; border-radius: 6px; font-size: 12px; 
@@ -78,6 +77,10 @@
             font-family: inherit;
         }
         .phone-input:focus { background: #cbd5e1; color: var(--navy); }
+
+        /* الأزرار الجديدة */
+        .btn-add-action { background: var(--cyan); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 12px; }
+        .btn-archive-toggle { background: #94a3b8; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -153,16 +156,18 @@
                     </div>
                     <div style="display:${isOpen?'block':'none'}">
                         ${(gp.children || []).map((st, sIdx) => {
+                            // إخفاء الطالب المؤرشف فقط إذا لم نكن نبحث عنه
                             if(st.isArchived && search === "") return "";
+                            
                             const stId = `${gpId}-s-${sIdx}`;
                             const stOpen = openStates.students[stId];
                             return `
-                            <div class="student-container">
+                            <div class="student-container" style="${st.isArchived ? 'opacity:0.5; background:#f1f5f9;' : ''}">
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <button class="btn-delete" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
                                         <div style="display:flex; flex-direction:column;">
-                                            <span style="font-weight:800; font-size:17px;">${st.name||'No Name'}</span>
+                                            <span style="font-weight:800; font-size:17px;">${st.name||'No Name'} ${st.isArchived ? '📦' : ''}</span>
                                             <div style="display:flex; align-items:center; gap:4px;">
                                                 <span style="font-size:12px;">📞</span>
                                                 <input type="text" class="phone-input" value="${st.phone||''}" 
@@ -171,9 +176,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div style="display:flex; gap:10px;">
-                                        <button class="status-btn status-present" style="background:#6366f1; font-size:12px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print 🖨️</button>
-                                        <button class="status-btn status-present" style="background:var(--cyan); font-size:12px;" onclick="toggleBox('students','${stId}')">${stOpen?'Hide':'Sessions'}</button>
+                                    <div style="display:flex; gap:10px; align-items:center;">
+                                        <button class="btn-archive-toggle" onclick="toggleArchive(${lIdx},${gIdx},${sIdx})">${st.isArchived ? 'Unarchive' : 'Archive'}</button>
+                                        <button class="status-btn status-present" style="background:#6366f1; font-size:12px; flex:none; width:60px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print 🖨️</button>
+                                        <button class="status-btn status-present" style="background:var(--cyan); font-size:12px; flex:none; width:75px;" onclick="toggleBox('students','${stId}')">${stOpen?'Hide':'Sessions'}</button>
                                     </div>
                                 </div>
                                 <div style="display:${stOpen?'block':'none'}; margin-top:20px; border-top:2px dashed #eee; padding-top:15px;">
@@ -201,18 +207,57 @@
                                 </div>
                             </div>`;
                         }).join('')}
+                        <button class="btn-add-action" onclick="addNewStudent(${lIdx},${gIdx})">+ Add Student</button>
                     </div>
                 </div>`;
             }).join('');
 
             const div = document.createElement('div');
             div.className = 'level-card';
-            div.innerHTML = `<h2 style="margin:0; font-weight:800;">${lv.name}</h2>` + groupsHTML;
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h2 style="margin:0; font-weight:800;">${lv.name}</h2>
+                    <button class="btn-add-action" style="margin:0;" onclick="addNewGroup(${lIdx})">+ Add Group</button>
+                </div>
+            ` + groupsHTML;
             root.appendChild(div);
         });
     }
 
-    // وظيفة تحديث رقم الهاتف
+    // وظيفة إضافة جروب جديد
+    async function addNewGroup(lIdx) {
+        const day = prompt("Enter Group Day (e.g. Saturday):");
+        const time = prompt("Enter Group Time (e.g. 05:00 PM):");
+        if(day && time) {
+            levelsData[lIdx].groups.push({ day, time, children: [] });
+            await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+        }
+    }
+
+    // وظيفة إضافة طالب جديد
+    async function addNewStudent(lIdx, gIdx) {
+        const name = prompt("Enter Student Name:");
+        const phone = prompt("Enter Phone Number (e.g. 0123456789):");
+        if(name && phone) {
+            const newSt = {
+                name: name,
+                phone: phone,
+                isArchived: false,
+                sessions: Array.from({length: 8}, () => ({ present: true, date: "", feedback: "" }))
+            };
+            levelsData[lIdx].groups[gIdx].children.push(newSt);
+            await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+        }
+    }
+
+    // وظيفة الأرشفة وإلغاء الأرشفة
+    async function toggleArchive(lIdx, gIdx, sIdx) {
+        const currentStatus = levelsData[lIdx].groups[gIdx].children[sIdx].isArchived;
+        levelsData[lIdx].groups[gIdx].children[sIdx].isArchived = !currentStatus;
+        await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+        render();
+    }
+
     async function updatePhone(lIdx, gIdx, sIdx, newPhone) {
         levelsData[lIdx].groups[gIdx].children[sIdx].phone = newPhone;
         await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
