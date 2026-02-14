@@ -19,13 +19,11 @@
         
         body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-page); color: var(--navy); }
 
-        /* --- Login --- */
         #lock-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--navy), var(--cyan)); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .login-box { background: var(--white); padding: 40px; border-radius: 24px; text-align: center; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         .login-box input { width: 100%; height: 50px; border-radius: 12px; border: 2px solid #eee; text-align: center; margin-bottom: 20px; font-size: 16px; outline: none; }
         .btn-login { width: 100%; height: 50px; background: var(--pink); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* --- Layout --- */
         .main-header { background: var(--navy); padding: 25px; text-align: center; color: white; }
         .search-container { max-width: 800px; margin: -25px auto 20px; padding: 0 20px; }
         #search-input { width: 100%; height: 55px; border-radius: 15px; border: none; padding: 0 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); font-size: 16px; outline: none; }
@@ -35,15 +33,9 @@
         .group-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-top: 15px; }
         .student-container { background: white; border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-top: 10px; }
 
-        /* --- Session Row --- */
-        .session-row { 
-            display: flex; flex-direction: column; gap: 15px; 
-            background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 15px;
-            border-left: 5px solid var(--cyan);
-        }
+        .session-row { display: flex; flex-direction: column; gap: 15px; background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--cyan); }
         @media (min-width: 768px) { .session-row { flex-direction: row; align-items: flex-start; } }
 
-        /* --- Attendance & Date --- */
         .attendance-box { display: flex; gap: 8px; min-width: 140px; }
         .status-btn { padding: 10px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; flex: 1; font-size: 13px; transition: 0.2s; }
         .status-present { background: var(--success); color: white; }
@@ -53,34 +45,19 @@
         .date-box { min-width: 150px; }
         .input-date { width: 100%; height: 45px; border-radius: 10px; border: 2px solid var(--border); padding: 0 8px; font-size: 15px; font-weight: 600; font-family: inherit; }
 
-        /* --- Feedback & Emojis --- */
         .feedback-container { flex: 3; display: flex; flex-direction: column; }
-        textarea { 
-            height: 80px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); 
-            border-bottom: none; padding: 10px; font-size: 15px; direction: rtl; box-sizing: border-box; resize: none; font-family: inherit;
-        }
-        .emoji-bar { 
-            display: flex; gap: 12px; background: #fff; padding: 8px; 
-            border: 1.5px solid var(--border); border-radius: 0 0 12px 12px; overflow-x: auto;
-        }
+        textarea { height: 80px; width: 100%; border-radius: 12px 12px 0 0; border: 1.5px solid var(--border); border-bottom: none; padding: 10px; font-size: 15px; direction: rtl; box-sizing: border-box; resize: none; font-family: inherit; }
+        .emoji-bar { display: flex; gap: 12px; background: #fff; padding: 8px; border: 1.5px solid var(--border); border-radius: 0 0 12px 12px; overflow-x: auto; }
         .emoji-item { font-size: 24px; cursor: pointer; transition: 0.2s; user-select: none; }
 
         .btn-wa { background: #22c55e; color: white; border: none; border-radius: 12px; min-width: 50px; height: 50px; font-size: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        
         .btn-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 18px; padding: 5px; transition: 0.3s; }
         .btn-delete:hover { color: var(--danger); }
         
-        .phone-input { 
-            background: #e2e8f0; border: none; color: #475569; 
-            padding: 2px 8px; border-radius: 6px; font-size: 12px; 
-            font-weight: 600; width: 110px; outline: none;
-            font-family: inherit;
-        }
-        .phone-input:focus { background: #cbd5e1; color: var(--navy); }
+        .phone-input { background: #e2e8f0; border: none; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; width: 110px; outline: none; font-family: inherit; }
 
-        /* الأزرار الجديدة */
-        .btn-add-action { background: var(--cyan); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 12px; }
-        .btn-archive-toggle { background: #94a3b8; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+        .btn-add-action { background: var(--navy); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px; margin-top: 10px; }
+        .btn-archive-tool { background: #94a3b8; color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -156,18 +133,16 @@
                     </div>
                     <div style="display:${isOpen?'block':'none'}">
                         ${(gp.children || []).map((st, sIdx) => {
-                            // إخفاء الطالب المؤرشف فقط إذا لم نكن نبحث عنه
                             if(st.isArchived && search === "") return "";
-                            
                             const stId = `${gpId}-s-${sIdx}`;
                             const stOpen = openStates.students[stId];
                             return `
-                            <div class="student-container" style="${st.isArchived ? 'opacity:0.5; background:#f1f5f9;' : ''}">
+                            <div class="student-container" style="${st.isArchived ? 'opacity:0.6; background:#f8fafc;' : ''}">
                                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                                     <div style="display:flex; align-items:center; gap:8px;">
                                         <button class="btn-delete" onclick="deleteStudent(${lIdx},${gIdx},${sIdx})">🗑️</button>
                                         <div style="display:flex; flex-direction:column;">
-                                            <span style="font-weight:800; font-size:17px;">${st.name||'No Name'} ${st.isArchived ? '📦' : ''}</span>
+                                            <b style="font-size:17px;">${st.name||'No Name'} ${st.isArchived ? '(📦)' : ''}</b>
                                             <div style="display:flex; align-items:center; gap:4px;">
                                                 <span style="font-size:12px;">📞</span>
                                                 <input type="text" class="phone-input" value="${st.phone||''}" 
@@ -176,13 +151,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div style="display:flex; gap:10px; align-items:center;">
-                                        <button class="btn-archive-toggle" onclick="toggleArchive(${lIdx},${gIdx},${sIdx})">${st.isArchived ? 'Unarchive' : 'Archive'}</button>
-                                        <button class="status-btn status-present" style="background:#6366f1; font-size:12px; flex:none; width:60px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print 🖨️</button>
+                                    <div style="display:flex; gap:10px;">
+                                        <button class="btn-archive-tool" onclick="toggleArchive(${lIdx},${gIdx},${sIdx})">${st.isArchived ? 'Unarchive' : 'Archive'}</button>
+                                        <button class="status-btn status-present" style="background:#6366f1; font-size:12px; flex:none; width:60px;" onclick="printR(${lIdx},${gIdx},${sIdx})">Print</button>
                                         <button class="status-btn status-present" style="background:var(--cyan); font-size:12px; flex:none; width:75px;" onclick="toggleBox('students','${stId}')">${stOpen?'Hide':'Sessions'}</button>
                                     </div>
                                 </div>
-                                <div style="display:${stOpen?'block':'none'}; margin-top:20px; border-top:2px dashed #eee; padding-top:15px;">
+                                <div style="display:${stOpen?'block':'none'}; margin-top:20px;">
                                     ${(st.sessions || []).map((ss, ssIdx) => `
                                         <div class="session-row">
                                             <div style="font-weight:800;">S${ssIdx+1}</div>
@@ -190,13 +165,9 @@
                                                 <button class="status-btn ${ss.present?'status-present':'status-absent'}" onclick="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',true)">حضور</button>
                                                 <button class="status-btn ${!ss.present?'status-is-absent':'status-absent'}" onclick="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'present',false)">غياب</button>
                                             </div>
-                                            <div class="date-box">
-                                                <input type="date" class="input-date" value="${ss.date||''}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'date',this.value)">
-                                            </div>
+                                            <input type="date" class="input-date" value="${ss.date||''}" onchange="upSess(${lIdx},${gIdx},${sIdx},${ssIdx},'date',this.value)">
                                             <div class="feedback-container">
-                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" placeholder="Feedback..." 
-                                                    onfocus="isTyping=true" onblur="isTyping=false"
-                                                    oninput="upSessSilent(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
+                                                <textarea id="tx-${lIdx}-${gIdx}-${sIdx}-${ssIdx}" onfocus="isTyping=true" onblur="isTyping=false" oninput="upSessSilent(${lIdx},${gIdx},${sIdx},${ssIdx},'feedback',this.value)">${ss.feedback||''}</textarea>
                                                 <div class="emoji-bar">
                                                     ${['❤️','💖','👏','👦','👧','🌟','💪','✅'].map(e => `<span class="emoji-item" onclick="addE('${lIdx}-${gIdx}-${sIdx}-${ssIdx}','${e}',${lIdx},${gIdx},${sIdx},${ssIdx})">${e}</span>`).join('')}
                                                 </div>
@@ -214,75 +185,56 @@
 
             const div = document.createElement('div');
             div.className = 'level-card';
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h2 style="margin:0; font-weight:800;">${lv.name}</h2>
-                    <button class="btn-add-action" style="margin:0;" onclick="addNewGroup(${lIdx})">+ Add Group</button>
-                </div>
-            ` + groupsHTML;
+            div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">${lv.name}</h2>
+                <button class="btn-add-action" style="margin:0;" onclick="addNewGroup(${lIdx})">+ Add Group</button>
+            </div>` + groupsHTML;
             root.appendChild(div);
         });
     }
 
-    // وظيفة إضافة جروب جديد
-    async function addNewGroup(lIdx) {
-        const day = prompt("Enter Group Day (e.g. Saturday):");
-        const time = prompt("Enter Group Time (e.g. 05:00 PM):");
-        if(day && time) {
-            levelsData[lIdx].groups.push({ day, time, children: [] });
-            await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
-        }
-    }
-
-    // وظيفة إضافة طالب جديد
     async function addNewStudent(lIdx, gIdx) {
-        const name = prompt("Enter Student Name:");
-        const phone = prompt("Enter Phone Number (e.g. 0123456789):");
+        const name = prompt("Student Name:");
+        const phone = prompt("Phone:");
         if(name && phone) {
-            const newSt = {
-                name: name,
-                phone: phone,
-                isArchived: false,
-                sessions: Array.from({length: 8}, () => ({ present: true, date: "", feedback: "" }))
-            };
+            isTyping = true;
+            const newSt = { name, phone, isArchived: false, sessions: Array.from({length: 8}, () => ({ present: true, date: "", feedback: "" })) };
             levelsData[lIdx].groups[gIdx].children.push(newSt);
             await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+            isTyping = false;
+            render();
         }
     }
 
-    // وظيفة الأرشفة وإلغاء الأرشفة
+    async function addNewGroup(lIdx) {
+        const day = prompt("Day:");
+        const time = prompt("Time:");
+        if(day && time) {
+            isTyping = true;
+            levelsData[lIdx].groups.push({ day, time, children: [] });
+            await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
+            isTyping = false;
+            render();
+        }
+    }
+
     async function toggleArchive(lIdx, gIdx, sIdx) {
-        const currentStatus = levelsData[lIdx].groups[gIdx].children[sIdx].isArchived;
-        levelsData[lIdx].groups[gIdx].children[sIdx].isArchived = !currentStatus;
+        levelsData[lIdx].groups[gIdx].children[sIdx].isArchived = !levelsData[lIdx].groups[gIdx].children[sIdx].isArchived;
         await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
         render();
     }
 
-    async function updatePhone(lIdx, gIdx, sIdx, newPhone) {
-        levelsData[lIdx].groups[gIdx].children[sIdx].phone = newPhone;
-        await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
-    }
-
-    function addE(id, e, l, g, s, ss) {
-        const textarea = document.getElementById('tx-' + id);
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const text = textarea.value;
-        const newText = text.substring(0, start) + e + text.substring(end);
-        textarea.value = newText;
-        const newPos = start + e.length;
-        textarea.setSelectionRange(newPos, newPos);
-        textarea.focus();
-        upSessSilent(l, g, s, ss, 'feedback', textarea.value);
-    }
-
     async function deleteStudent(lIdx, gIdx, sIdx) {
-        const name = levelsData[lIdx].groups[gIdx].children[sIdx].name;
-        if (confirm(`هل أنتِ متأكدة من حذف الطالب "${name}"؟`)) {
+        if (confirm("هل تريد مسح هذا الطالب نهائياً؟")) {
             levelsData[lIdx].groups[gIdx].children.splice(sIdx, 1);
             await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
             render();
         }
+    }
+
+    async function updatePhone(lIdx, gIdx, sIdx, v) {
+        levelsData[lIdx].groups[gIdx].children[sIdx].phone = v;
+        await db.collection('levels').doc(levelsData[lIdx].id).update({ groups: levelsData[lIdx].groups });
     }
 
     async function upSessSilent(l, g, s, ss, f, v) { 
@@ -295,23 +247,29 @@
         await db.collection('levels').doc(levelsData[l].id).update({ groups: levelsData[l].groups });
         render(); 
     }
+
+    function addE(id, e, l, g, s, ss) {
+        const tx = document.getElementById('tx-' + id);
+        tx.value += e;
+        upSessSilent(l, g, s, ss, 'feedback', tx.value);
+    }
     
     function toggleBox(type, id) { openStates[type][id] = !openStates[type][id]; render(); }
 
     function sendWA(l, g, s, ssIdx) {
         const st = levelsData[l].groups[g].children[s];
         const ss = st.sessions[ssIdx];
-        const msg = `*E-Kidzy Report*%0A*Student:* ${st.name}%0A*Session:* ${ssIdx+1}%0A*Status:* ${ss.present ? 'Present ✅' : 'Absent ❌'}%0A*Feedback:* ${ss.feedback || '---'}`;
+        const msg = `*Report*%0A*Student:* ${st.name}%0A*Status:* ${ss.present ? 'Present ✅' : 'Absent ❌'}%0A*Feedback:* ${ss.feedback || '--'}`;
         window.open(`https://wa.me/2${st.phone}?text=${msg}`, '_blank');
     }
 
     function printR(l, g, s) {
         const lv = levelsData[l];
         const st = lv.groups[g].children[s];
-        let h = st.sessions.map((ss, i) => `<tr><td style="border:1px solid #ddd;padding:10px;">S${i+1}</td><td style="border:1px solid #ddd;padding:10px;">${ss.date||'--'}</td><td style="border:1px solid #ddd;padding:10px;">${ss.present?'Present':'Absent'}</td><td style="border:1px solid #ddd;padding:10px;direction:rtl;">${ss.feedback||'--'}</td></tr>`).join('');
+        let h = st.sessions.map((ss, i) => `<tr><td>S${i+1}</td><td>${ss.date||'--'}</td><td>${ss.present?'Present':'Absent'}</td><td>${ss.feedback||'--'}</td></tr>`).join('');
         const p = document.getElementById('print-area');
         p.style.display = 'block';
-        p.innerHTML = `<div style="padding:40px;direction:rtl;font-family:Arial;"><h1>Report: ${st.name}</h1><p>Level: ${lv.name}</p><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#eee;"><th>Session</th><th>Date</th><th>Status</th><th>Feedback</th></tr></thead><tbody>${h}</tbody></table></div>`;
+        p.innerHTML = `<div style="padding:20px;direction:rtl;"><h1>Report: ${st.name}</h1><table border="1" style="width:100%;border-collapse:collapse;">${h}</table></div>`;
         window.print();
         p.style.display = 'none';
     }
